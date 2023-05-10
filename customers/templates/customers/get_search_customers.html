@@ -1,0 +1,32 @@
+{% for customer in customers %}<!--This customers should be the data of pagination-->
+<tr>
+
+    <td><a href="{% url 'customer_app:view' customer.id %}" class="btn btn-primary btn-sm"><i
+                class="fa fa-eye"></i></a></td>
+    <td>{{customer.id}}</td>
+    <td>{{customer.name}} </td>
+    <td>{{customer.email}}</th>
+    <td>{{customer.contact}}</td>
+    <td>{{customer.date_created}}</td>
+    <td>
+        <button type="button" data-cid="{{customer.id}}" data-target="#AddCustomer" data-toggle="modal" class="btn btn-success btn-sm btn-edit ">
+            <i class="fas fa-edit"></i>
+
+            {% if request.user.is_superuser %}
+            <button type="button" data-cid="{{customer.id}}"
+                class="ml-1 btn btn-danger btn-sm btn-del"><i
+                    class="fas fa-trash-alt"></i></button>
+            {% endif %}
+
+            <a href="{% url 'order_app:create' customer.id %}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus"></i>
+            </a>
+
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class=" text-center alert alert-danger">No Product Found</td>
+</tr>
+
+{% endfor %}

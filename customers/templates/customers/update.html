@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Edit customers{% endblock%}
+
+{% block content %}
+
+<!-- <body class="bg-secondary"> -->
+
+    <main>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-5">
+                    <div class="card shadow-lg border-0 rounded-lg mt-5 " >
+                        <div class="card-header"><h2 class="text-center font-weight-light my-4">Edit Customer</h2></div>
+                        
+                        <div class="card-body">
+                          
+                            <form method="POST" class="justify-content-center" >
+                              {% csrf_token %}
+
+                              {{form|crispy}}
+
+                              <a href="/customers/list/" class="btn btn-success">Back</a>
+                              <button type="submit" class="btn btn-danger">Save</button>
+                            
+                              
+                            </form>
+                            
+                        </div>
+                     
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- </body> -->
+    <style>
+        body{
+            background: #a1c4fd;
+        
+          }
+    </style>
+
+{% endblock%}
+
+

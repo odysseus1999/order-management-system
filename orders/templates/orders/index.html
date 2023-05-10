@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block title %}Orders{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'vendor/js/scripts.js' %}"></script>
+<script src="{% static 'products/search.js' %}"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<!--Nav bar and side bar which include search and others-->
+
+<!--------------For navbar and toggle bar----------------------------->
+{% include 'navbar.html' %}
+
+
+<!---------------For total order and total proce card---------------------------->
+{% include 'includes/card.html' %}
+
+
+<!--for django messages-->
+{% include 'message.html' %}
+
+
+<!--Search bar and invoice-->
+<div class="col">
+    <div class="card border-dark" style="margin-left:18%;padding-right:15%;padding:10px;margin-bottom:10px;">
+        <h3 class="card-header"> Orders Of All Customers</h3>
+
+    </div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-left:20%;">
+
+    {% include 'includes/formsearch.html' %}
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a href="{% url 'order_app:pdf' %}" class="btn  btn-danger ml-2 mt-1"> <i class="fas fa-file-pdf"></i>
+                    PDF</a>
+            </li>
+
+        </ul>
+
+    </div>
+</nav>
+
+<hr>
+
+
+
+<!------------------List of Order in table------------------------->
+{% include 'includes/order_list.html' %}
+<!----------------------------------------------------------------->
+
+
+<!--Below code is for pagination -->
+
+<div class="row">
+
+    <div class="col">
+
+        <div class="mb-4" style="margin-left:22%;position:fixed;">
+            <Strong> Showing {{start}} to {{end}} of {{total_orders}} orders</Strong>
+        </div>
+
+    </div>
+
+    <div class="col">
+
+
+        <div style="margin-right:40%;" class="float-right">
+
+            {% if orders.has_other_pages %}
+            <ul class="pagination">
+                {% if orders.has_previous %}
+                <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+                <a class="btn btn-outline-info mb-4" href="?page={{ orders.previous_page_number }}">Previous</a>
+                {% else %}
+
+                {% endif %}
+
+                {% for i in orders.paginator.page_range %}
+                {% if orders.number == i %}
+                <!--recent page ma dark dekhauxa-->
+                <li class="btn btn-info mb-4"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+
+                <li><a class="btn btn-outline-info mb-4" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+
+                <a class="btn btn-outline-info mb-4" href="?page={{ orders.next_page_number }}">Next</a>
+                <a class="btn btn-outline-info mb-4" href="?page={{ orders.paginator.num_pages }}">Last</a>
+                {% else %}
+                <!-- <li class="btn btn-outline-info mb-4"><span>&raquo;</span></li> -->
+                {% endif %}
+                <hr>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock%}

@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% load static %}
+
+{% block title %}Customers{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'vendor/js/scripts.js' %}"></script>
+<script src="{% static 'products/search.js' %}"></script>
+<script src="{% static 'customers/scroll.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<!--Nav bar and side bar which include search and others-->
+
+{% include 'navbar.html' %}
+
+
+<br><br>
+<hr>
+
+<!--for messages tag-->
+
+{% include 'message.html' %}
+
+   
+   
+
+<div class="row">
+    <div class="col-lg-10" style="margin-left:15%;">
+          <div class="alert alert-success" id="upt_success" style="display:none">
+
+          </div>
+           <div class="alert alert-danger" id="upt_error" style="display:none">
+
+          </div>
+    </div>
+</div>
+
+
+<div class="col">
+    <div class="card border-dark" style="margin-left:18%;padding-right:15%;padding:10px;margin-bottom:10px;">
+        <h3 class="card-header"> Customers Details</h3>
+
+    </div>
+</div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-left:18%;">
+
+        {% include "customers/formsearch.html" %}
+
+        <button class="navbar-toggler mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <button data-toggle="modal" data-target="#AddCustomer" class=" btn btn-primary mt-1 ml-2">
+
+                    <i class=" fas fa-plus "></i> Customer
+                    <!-- I dont need to use url because Add Customer garda data-target la id search gardai janxa id ma -->
+                    </button>
+            </li>
+            <li class="nav-item">
+                <a type="button" class="btn btn-primary mt-1 ml-2" href="{% url 'customer_app:export' %}"><i class="fas fa-file-export"></i> Export</a>
+            </li>
+           
+            <li class="nav-item">
+                <a type="button" href="{% url 'customer_app:pdf' %}" class="btn  btn-danger mt-1 ml-2"><i class="fas fa-file-pdf"></i> PDF</a>
+            </li>
+
+          
+          </ul>
+          <button  style="margin-left:40%;" onclick = " scrollToBottom()" class="btn btn-primary mt-2"> <i class="fas fa-arrow-alt-circle-down fa-1x "></i>
+          </button>
+
+          
+        </div>
+      </nav>
+    <hr>
+
+
+
+
+{% include 'includes/customer_list.html' %}
+{% include 'includes/add_edit_form.html' %}<!--This is for showing model add/edit  customer-->
+
+
+
+<button  id="back-to-top" style="float:right;margin-right:1%;" class="btn btn-primary"> <i class="fas fa-arrow-alt-circle-up fa-1x"></i>
+</button>
+
+
+<script>
+
+    $(document).ready(function(){
+
+
+        $(".btn-insert-data").click(function(e){
+            console.log("button click")
+
+            e.preventDefault();
+            e.stopPropagation(); 
+    
+            output="";
+
+           var cid=$("#cusid").val();// <input type="hidden" name="cusid" id="cusid" /> inside modal form in includes/add_edit_form.html 
+            var name=$("#id_name").val();
+            var email=$("#id_email").val();
+          
+            var contact=$("#id_contact").val();
+            let csr = $("input[ name=csrfmiddlewaretoken]").val();
+            
+            if(name==""){
+                $("#ins_error").text("Please Enter Name")//ins_error is below the form(look id in includes/add_edit_form.html )
+                $("#ins_error").show()
+                return;
+            }
+            else if(email==""){
+                $("#ins_error").text("Please Enter email")
+                $("#ins_error").show()
+                return;
+            }
+            else if(contact==""){
+                $("#ins_error").text("Please Enter Contact Number")
+                $("#ins_error").show()
+                return;
+              return;
+            }
+            else{
+    
+            
+                $.ajax({
+                 
+                    url : '{% url "customer_app:create" %}',
+                    method:'POST',
+                    data:{cusid:cid,name:name,email:email,contact:contact,csrfmiddlewaretoken:csr},
+                    
+    
+                })
+                
+                .done(function(data){//response bring all the data
+                    console.log(data.customer_data)
+    
+    
+                            x=data.customer_data
+                            if(data.status=="Save"){
+
+                              //  $("#msg").text("Form Submitted Successfully");
+                              //  $("#msg").show();
+                            
+                                 $("#AddCustomer .close").click();
+                                 $("#upt_error").hide();
+                                 $("#upt_success").text(data.message);
+                                $("#upt_success").show();
+    
+                             
+    
+                                for(i=0;i<x.length;i++){
+
+                                    output+=
+                                    `
+                                    <tr>
+                                        <td> <a href="customers/customer-id-${x[i].id}/order/" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-eye"></i></a>
+                                        </td>
+                                        <td> ${x[i].id}</td>
+                                        <td> ${x[i].name}</td>
+                                        <td> ${x[i].email}</td>
+                                        <td> ${x[i].contact}</td>
+                                        <td>${x[i].date_created}</td>
+                                        <td>
+                                            <button type='button' class='btn btn-success btn-sm  btn-edit' data-target="#AddCustomer" data-toggle="modal"   data-cid=" ${x[i].id}" ><i class='fa fa-edit'></i></button>    <button type='button' class='btn btn-danger  btn-sm  btn-del'  data-cid=" ${x[i].id}" ><i class='fa fa-trash-alt'></i></button>     <a href='' class='btn btn-success btn-sm'>  <i class='fas fa-plus'></i> </a>
+                                        </td>
+                                     
+                                    </tr>
+                                    `
+                                  
+                                    $(".table tbody").html(output);
+        }
+        }
+       
+    
+    
+                  
+                })
+             
+                .fail(function(){
+                     $("#ins_success").hide();//
+                     $("#ins_error").text("Something Went Wrong!");
+                     $("#ins_error").show();
+                })
+                .always(function(){
+                    $(".btn-insert-data").removeAttr("disabled");
+                   $(".btn-insert-data").text("Save");
+                })
+    
+    
+    
+   //  setInterval('location.reload()', 1300);  
+    
+            }
+        })
+    
+      //edit form
+        $("tbody").on("click",".btn-edit",function(){
+            let id=$(this).attr("data-cid");
+            let csr = $("input[ name=csrfmiddlewaretoken]").val();
+            mydata={cid:id,csrfmiddlewaretoken:csr}
+            $.ajax({
+                url:"{% url 'customer_app:edit' %}",
+                method:"POST",
+                data:mydata,
+    
+                success:function(data){
+                    if(data.status == 1){
+    
+                        $("#upt_success").text(data.message);
+                        $("#upt_success").show();
+                    
+    
+                    }
+    
+                  
+                    $("#cusid").val(data.id);//<input type="hidden" name="cusid" id="cusid" /> in includes/add_edit_form.html
+                    $("#id_name").val(data.name);
+                    $("#id_email").val(data.email);
+                    $("#id_contact").val(data.contact);
+                    
+    
+                   
+                }
+                
+            })
+        })
+    
+       //Delete data
+       $("tbody").on("click",".btn-del",function(){
+           
+        let id=$(this).attr("data-cid");
+        let csr = $("input[ name=csrfmiddlewaretoken]").val();
+        mydata={cid:id,csrfmiddlewaretoken:csr}
+        mythis=this;
+        $.ajax({
+            url:"{% url 'customer_app:delete' %}",
+            method:"POST",
+            data:mydata,
+            success:function(data){
+    
+               
+                if(data.status==1){
+    
+    
+    
+                   $("#upt_error").hide();
+                    $("#upt_success").text(data.message);
+                   $("#upt_success").show();
+                    $(mythis).closest("tr").fadeOut();
+    
+                   
+                }
+                if(data.status==0){
+                    $("#upt_success").hide();
+                        $("#upt_error").text(data.message);
+                        $("#upt_error").show();
+                }
+            }
+        })
+    })
+
+    })
+  
+
+    
+</script>
+
+{% endblock%}
+
+

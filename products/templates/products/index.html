@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% load static %}
+
+{% block javascript %}
+
+<script src="{% static 'vendor/js/scripts.js' %}"></script>
+<script src="{% static 'products/products.js' %}"></script>
+<script src="{% static 'products/search.js' %}"></script>
+
+{% endblock %}
+
+{% block title %}Products{% endblock%}
+
+{% block content %}
+
+<!--Nav bar and side bar which include search and others-->
+
+{% include 'navbar.html' %}
+
+
+<br><br>
+<hr>
+
+
+
+<div class="row">
+    <div class="col-lg-10" style="margin-left:15%;">
+          <div class="alert alert-success" id="upt_success" style="display:none">
+
+          
+
+          </div>
+           <div class="alert alert-danger" id="upt_error" style="display:none">
+
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+
+          </div>
+    </div>
+</div>
+
+
+
+<div class="col">
+    <div class="card border-dark" style="margin-left:18%;padding-right:15%;padding:10px;margin-bottom:10px;">
+        <h3 class="card-header"> Product Details</h3>
+
+    </div>
+</div>
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-left:18%;">
+
+    {% include "products/formsearch.html" %}
+    
+   
+    <button class="navbar-toggler mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse mt-2" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+
+        <li class="nav-item active">
+
+            {% if request.user.is_authenticated %}
+            <button type=" button "  data-target="#AddProduct" data-toggle="modal" class=" btn btn-primary ml-2 mb-2 ">
+        
+                <i class=" fas fa-plus "></i> Product
+                <!-- I dont need to use url because Add Customer garda data-target la id search gardai janxa id ma -->
+            </button>
+            {% endif %}
+            
+        </li>
+        <li class="nav-item ">
+            <a href="{% url 'product_app:pdf' %}" class="btn  btn-danger ml-2"> <i class="fas fa-file-pdf"></i> PDF</a>
+        </li>
+
+      </ul>
+    
+    </div>
+  </nav>
+
+<hr>
+
+
+
+{% include 'includes/product_list.html' %}
+
+
+{% include 'includes/product_add_edit_form.html' %}
+
+
+
+<div class="row">
+
+    <div class="col mt-2" style="margin-left:19%;position:fixed;">
+
+
+        <Strong> Showing {{start}} to {{end}} of {{products_count}} products</Strong>
+
+
+    </div>
+
+    <div class="col" >
+
+
+        <div style="float:right;margin-right: 20%;">
+
+            {% if products.has_other_pages %}
+            <ul class="pagination">
+                {% if products.has_previous %}
+                <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+                <a class="btn btn-outline-info mb-4" href="?page={{ products.previous_page_number }}">Previous</a>
+                {% else %}
+
+                {% endif %}
+
+                {% for i in products.paginator.page_range %}
+                {% if products.number == i %}
+                <!--recent page ma dark dekhauxa-->
+                <li class="btn btn-info mb-4"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+
+                <li><a class="btn btn-outline-info mb-4" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+
+                <a class="btn btn-outline-info mb-4" href="?page={{ products.next_page_number }}">Next</a>
+                <a class="btn btn-outline-info mb-4" href="?page={{ products.paginator.num_pages }}">Last</a>
+                {% else %}
+                <!-- <li class="btn btn-outline-info mb-4"><span>&raquo;</span></li> -->
+                {% endif %}
+                <hr>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+ <script>
+   $(document).ready(function(){
+
+    $("#btn-insert-data").click(function(e){
+
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("button clicked")
+        
+        output="";
+
+        var pid=$("#proid").val();// <input type="hidden" name="proid" id="proid" /> inside modal form in includes/add_edit_form.html 
+        var name=$("#id_name").val();
+        var price=$("#id_price").val();
+        var quantity=$("#id_quantity").val();
+        var unit=$("#id_unit").val();
+        var description=$("#id_description").val();
+        let csr = $("input[ name=csrfmiddlewaretoken]").val();//if i use this and pass to url then i dont need to use csrf_exempt(somewhat not secure so use this way) in views
+        
+        if(name==""){
+            $("#ins_error").text("Please, Enter Product Name")//ins_error is below the form(look id in includes/add_edit_form.html )
+            $("#ins_error").show()
+            return;
+        }
+        else if(price==""){
+            $("#ins_error").text("Please Enter Price")
+            $("#ins_error").show()
+            return;
+        }
+        else if(quantity==""){
+            $("#ins_error").text("Please Enter Quantity")
+            $("#ins_error").show()
+            return;
+        } else if(unit==""){
+
+            $("#ins_error").text("Please Choose Unit")
+            $("#ins_error").show()
+            return;
+        } else if(description==""){
+            $("#ins_error").text("Please Enter product Description")
+            $("#ins_error").show()
+            return;
+        }
+        else{
+
+            $.ajax({
+             
+                url : "{% url 'product_app:create' %}",
+                method:"POST",
+                dataType:'json',
+              
+                data:{proid:pid,name:name,price:price,quantity:quantity,unit:unit,description:description,csrfmiddlewaretoken:csr},
+               
+
+
+                success:function(data){//response bring all the data
+                    
+                            x=data.product_data//I accept data in list
+
+                            if(data.status=="Save"){
+                                console.log(data.product_data)
+    
+                            
+                            
+                               $("#AddProduct .close").click();
+                                $("#upt_error").hide();
+                                 $("#upt_success").text(data.message);
+                                 $("#upt_success").show();
+    
+    
+                                for(i=0;i<x.length;i++){
+                                    output+=
+                                    "<tr><td>"+
+                                        x[i].id+
+    
+                                        "</td><td>"+
+                                            x[i].name+
+    
+                                        "</td><td>"+
+                                            x[i].price+
+    
+                                        "</td><td>"+
+                                            x[i].description+
+    
+                                        "</td><td> "+
+                                            x[i].quantity+" <span data-type = 'unit'> "+x[i].unit+" </span>"+
+                                        
+                                    
+                                        "</td> <td>"+
+                                            x[i].created_at+
+    
+                            "</td> <td><button type='button' class='btn btn-success btn-sm  btn-edit' data-target='#AddProduct' data-toggle='modal'   data-pid="+x[i].id+" ><i class='fa fa-edit'></i></button>    <button type='button' class='btn btn-danger  btn-sm  btn-del'  data-pid="+x[i].id+" ><i class='fa fa-trash-alt'></i></button>"+
+    
+                               
+                                    "</td></tr>";
+    
+    
+                                    $(".table tbody").html(output);
+                                    $("#proid").val('');
+                                    $("form")[0].reset();
+                    }
+
+                    if(data.status==0){
+                        $("#msg").text("Unable to Save Data");
+                        $("#msg").show();
+                        $("#stuid").val('');
+                        $("form")[0].reset();
+                    }
+        }              
+                }
+            })
+
+           // setInterval('location.reload()', 10000);  
+        }
+    })
+
+  //edit form
+    $("tbody").on("click",".btn-edit",function(){
+        
+        let id=$(this).attr("data-pid");
+        let csr = $("input[ name=csrfmiddlewaretoken]").val();
+        mydata={pid:id,csrfmiddlewaretoken:csr}
+
+        $.ajax({
+            url:"{% url 'product_app:edit' %}",
+            method:"POST",
+            data:mydata,
+            dataType:"json",
+
+            success:function(data){//means after get particular data it to edit it
+                console.log(data)
+                console.log("edited")
+                if(data.status == 1){
+
+                    $("#upt_error").hide();
+                    $("#upt_success").text(data.message);
+                   $("#upt_success").show();
+
+                }
+
+              //Logic to show the data to the form so as to edit it.
+
+              //{id: 273, name: "Peanut Butter", price: "600.00", quantity: 49, unit: "kg", …}  example for this data
+
+                $("#proid").val(data.id);//I dont want to see id when click on edit so i use hidden type but it should be pass to views
+                //<input type="hidden" name="proid" id="proid" /> in includes/add_edit_form.html
+                $("#id_name").val(data.name);
+                $("#id_price").val(data.price);
+                $("#id_quantity").val(data.quantity);
+                $("#id_unit").val(data.unit);
+                $("#id_description").val(data.description);
+
+               
+            }
+            
+        })
+    })
+
+   //Delete data
+   $("tbody").on("click",".btn-del",function(){
+
+ 
+    
+    let id=$(this).attr("data-pid");
+    let csr = $("input[ name=csrfmiddlewaretoken]").val();
+    mydata={pid:id,csrfmiddlewaretoken:csr}
+    mythis=this;
+
+    $.ajax({
+        url:"{% url 'product_app:delete_product' %}",
+        method:"POST",
+        data:mydata,
+        success:function(data){
+          //  console.log("success delete")
+
+           
+            if(data.status==1){
+
+
+
+               $("#upt_error").hide();
+                $("#upt_success").text(data.message);
+               $("#upt_success").show();
+                $(mythis).closest("tr").fadeOut();
+
+               
+            }
+            if(data.status==0){
+                $("#upt_success").hide();
+                    $("#upt_error").text(data.message);
+                    $("#upt_error").show();
+            }
+        }
+    })
+})
+
+    
+
+
+   });
+</script>
+
+{% endblock %}
+
