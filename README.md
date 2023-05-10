@@ -12,14 +12,14 @@ This system also provides admin panel from where all the registered users, produ
 
 ------------------------------------------
 #### How To Run The Project?
-To run this project, you must have installed Python on your PC. After downloading the project, follow the steps below:
-Step-1: Extract/unzip the file
+*To run this project, you must have installed Python on your PC. After downloading the project, follow the steps below:
+* Step-1: Extract/unzip the file
 
-Step-2: Go inside the project folder, open cmd and type the following commands to install Django Framework and run the webserver:
+* Step-2: Go inside the project folder, open cmd and type the following commands to install Django Framework and run the webserver:
 
-pip install -r requirements.txt
-python manage.py runserver
-Step-3: Finally, open the browser and go to localhost:8000
+- pip install -r requirements.txt
+- python manage.py runserver
+*Step-3: Finally, open the browser and go to localhost:8000
 ------------------------------------------
 
 #### This project still has scope of development, so you can also contribute to this Project as follows:
