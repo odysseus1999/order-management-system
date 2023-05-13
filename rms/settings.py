@@ -164,8 +164,9 @@ LOGOUT_REDIRECT_URL = '/user/login'
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')#heroku hold in this way for satic files
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS =[os.path.join(BASE_DIR,"static")]
+
 
 
 
@@ -207,4 +208,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # # Activate Django-Heroku.
 # #it configures database ,allowed hosts and many other that suits heroku env setting
-# django_on_heroku.settings(locals())
+django_on_heroku.settings(locals())
