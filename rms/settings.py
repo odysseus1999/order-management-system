@@ -27,9 +27,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = True
 
 
-
-ALLOWED_HOSTS = ['.vercel.app', '.now.sh']
-
+ALLOWED_HOSTS = ['sunil2002.pythonanywhere.com','127.0.0.1,']
 
 
 # Application definition
@@ -168,8 +166,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')#heroku hold in this way for satic files
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS =[os.path.join(BASE_DIR,"static")]
-STATICFILES_DIRS = os.path.join(BASE_DIR,'static'),
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
+
 
 
 
