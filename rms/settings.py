@@ -27,7 +27,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['sunil2002.pythonanywhere.com','127.0.0.1,']
+ALLOWED_HOSTS = ['sunil2002.pythonanywhere.com','127.0.0.1']
 
 
 # Application definition
@@ -171,8 +171,6 @@ STATICFILES_DIRS =[os.path.join(BASE_DIR,"static")]
 
 
 
-
-
 #for image upload
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')#this makes folder media and hold images Profile_images inside static and upload profile_img
@@ -210,5 +208,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # # Activate Django-Heroku.
 # #it configures database ,allowed hosts and many other that suits heroku env setting
-#django_on_heroku.settings(locals())
-
+django_on_heroku.settings(locals())
