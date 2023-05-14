@@ -27,7 +27,9 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['djangosupermarket.herokuapp.com','127.0.0.1']
+
+ALLOWED_HOSTS = ['.vercel.app', '.now.sh']
+
 
 
 # Application definition
@@ -166,6 +168,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')#heroku hold in this way for satic files
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS =[os.path.join(BASE_DIR,"static")]
+STATICFILES_DIRS = os.path.join(BASE_DIR,'static'),
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
+
 
 
 
@@ -208,4 +213,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # # Activate Django-Heroku.
 # #it configures database ,allowed hosts and many other that suits heroku env setting
-django_on_heroku.settings(locals())
+#django_on_heroku.settings(locals())
+
